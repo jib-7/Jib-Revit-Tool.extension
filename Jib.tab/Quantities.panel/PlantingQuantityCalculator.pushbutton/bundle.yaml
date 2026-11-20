@@ -1,0 +1,5 @@
+title: Planting Quantity Calculator
+tooltip: >-
+  Calculates Net Area (rounded to whole m2) and Planting Quantity
+  (Net Area x Planting Density) for every Fill Region in the active document.
+author: Your Name

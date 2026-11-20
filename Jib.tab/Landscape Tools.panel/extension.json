@@ -1,0 +1,7 @@
+{
+  "name": "FillPlanterCavity",
+  "description": "Fill Planter Cavity (026): detects a planter soil cavity from detail lines/components, creates the 026 Filled Region and the 005/006/008/010 detail items.",
+  "author": "BIM Automation",
+  "version": "1.0.0",
+  "dependencies": []
+}

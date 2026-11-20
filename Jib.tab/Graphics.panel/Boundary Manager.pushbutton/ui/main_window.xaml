@@ -1,0 +1,308 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Filled Region Boundary Manager" Width="1240" Height="820" MinWidth="1040" MinHeight="680"
+        WindowStartupLocation="CenterScreen" FontFamily="Segoe UI" FontSize="12" Background="#FFF5F6F8">
+  <Window.Resources>
+    <Style TargetType="Button"><Setter Property="Padding" Value="10,4"/><Setter Property="Margin" Value="3"/></Style>
+    <Style TargetType="TextBox"><Setter Property="Padding" Value="3"/><Setter Property="Margin" Value="2"/><Setter Property="VerticalContentAlignment" Value="Center"/></Style>
+    <Style TargetType="ComboBox"><Setter Property="Padding" Value="4,3"/><Setter Property="Margin" Value="2"/></Style>
+    <Style TargetType="GroupBox"><Setter Property="Margin" Value="4"/><Setter Property="Padding" Value="6"/></Style>
+    <Style TargetType="RadioButton"><Setter Property="Margin" Value="4,3"/></Style>
+    <Style TargetType="DataGrid">
+      <Setter Property="AutoGenerateColumns" Value="False"/><Setter Property="CanUserAddRows" Value="False"/>
+      <Setter Property="IsReadOnly" Value="True"/><Setter Property="HeadersVisibility" Value="Column"/>
+      <Setter Property="GridLinesVisibility" Value="Horizontal"/><Setter Property="HorizontalGridLinesBrush" Value="#FFE3E3E3"/>
+      <Setter Property="Background" Value="White"/><Setter Property="Margin" Value="4"/><Setter Property="RowHeaderWidth" Value="0"/>
+      <Setter Property="SelectionMode" Value="Extended"/><Setter Property="AlternatingRowBackground" Value="#FFF9FAFB"/>
+    </Style>
+  </Window.Resources>
+  <DockPanel>
+    <Border DockPanel.Dock="Top" Background="#FF263238" Padding="14,8">
+      <StackPanel Orientation="Horizontal">
+        <TextBlock Text="FILLED REGION BOUNDARY MANAGER" Foreground="White" FontSize="16" FontWeight="Bold"/>
+        <TextBlock Text="   SELECT  &#x2192;  CREATE / DUPLICATE  &#x2192;  CUSTOMISE  &#x2192;  NAME  &#x2192;  PREVIEW  &#x2192;  SAVE  &#x2192;  APPLY" Foreground="#FF90A4AE" FontSize="11" VerticalAlignment="Center" Margin="14,0,0,0"/>
+      </StackPanel>
+    </Border>
+    <Border DockPanel.Dock="Bottom" Background="#FFE9ECEF" Padding="10,5">
+      <TextBlock x:Name="StatusText" Text="Ready." TextWrapping="Wrap"/>
+    </Border>
+    <TabControl x:Name="MainTabs" Margin="6" SelectionChanged="tab_changed">
+      <!-- ===== TAB 1: SELECT ===== -->
+      <TabItem Header="  1 &#xB7; Select &amp; Inspect  ">
+        <Grid Margin="6">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/><RowDefinition Height="2*"/><RowDefinition Height="Auto"/><RowDefinition Height="2*"/><RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+          <WrapPanel Grid.Row="0">
+            <Button Content="Select Filled Regions" Click="pick_replace" ToolTip="Pick in the model (replaces the current selection)"/>
+            <Button Content="Add to Selection" Click="pick_add"/>
+            <Button Content="Use Revit Selection" Click="use_revit_selection" ToolTip="Take the Filled Regions already selected in Revit"/>
+            <Button Content="All in Active View" Click="select_all_view"/>
+            <Border Width="1" Height="22" Background="#FFCCCCCC" Margin="6,2"/>
+            <ComboBox x:Name="TypeCombo" Width="230" ToolTip="Filled Region Type"/>
+            <CheckBox x:Name="ChkSelTypeProject" Content="whole project" VerticalAlignment="Center" Margin="4,0"/>
+            <Button Content="Select by Type" Click="select_by_type"/>
+            <Border Width="1" Height="22" Background="#FFCCCCCC" Margin="6,2"/>
+            <Button Content="Remove Highlighted" Click="remove_selected"/>
+            <Button Content="Clear Selection" Click="clear_selection"/>
+            <TextBlock x:Name="TotalText" FontWeight="Bold" VerticalAlignment="Center" Margin="12,0"/>
+          </WrapPanel>
+          <DataGrid x:Name="RegionsGrid" Grid.Row="1" SelectionChanged="regions_selection_changed">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Element ID" Binding="{Binding [Id]}" Width="90"/>
+              <DataGridTextColumn Header="Filled Region Type" Binding="{Binding [Type]}" Width="260"/>
+              <DataGridTextColumn Header="Boundary segments" Binding="{Binding [Segs]}" Width="130"/>
+              <DataGridTextColumn Header="Current boundary Line Style(s)" Binding="{Binding [Styles]}" Width="*"/>
+            </DataGrid.Columns>
+          </DataGrid>
+          <DockPanel Grid.Row="2">
+            <TextBlock Text="Boundary segments (highlight regions above to filter; tick segments for 'selected segments only' mode)" FontWeight="SemiBold" VerticalAlignment="Center" Margin="6,4"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+              <Button Content="Tick all" Click="seg_check_all"/>
+              <Button Content="Untick all" Click="seg_uncheck_all"/>
+              <Button Content="Show region in Revit" Click="show_in_revit"/>
+            </StackPanel>
+          </DockPanel>
+          <DataGrid x:Name="SegmentsGrid" Grid.Row="3" IsReadOnly="False">
+            <DataGrid.Columns>
+              <DataGridTemplateColumn Header="Use" Width="44">
+                <DataGridTemplateColumn.CellTemplate><DataTemplate>
+                  <CheckBox IsChecked="{Binding [Sel], Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"/>
+                </DataTemplate></DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTextColumn Header="Region" Binding="{Binding [Region]}" IsReadOnly="True" Width="80"/>
+              <DataGridTextColumn Header="Segment ID" Binding="{Binding [Seg]}" IsReadOnly="True" Width="90"/>
+              <DataGridTextColumn Header="Geometry" Binding="{Binding [Geom]}" IsReadOnly="True" Width="70"/>
+              <DataGridTextColumn Header="Length (mm)" Binding="{Binding [Len]}" IsReadOnly="True" Width="90"/>
+              <DataGridTextColumn Header="Line Style" Binding="{Binding [Style]}" IsReadOnly="True" Width="200"/>
+              <DataGridTextColumn Header="Weight" Binding="{Binding [Weight]}" IsReadOnly="True" Width="60"/>
+              <DataGridTextColumn Header="Colour" Binding="{Binding [Hex]}" IsReadOnly="True" Width="80"/>
+              <DataGridTextColumn Header="Pattern" Binding="{Binding [Pattern]}" IsReadOnly="True" Width="120"/>
+              <DataGridTextColumn Header="Graphics Style ID" Binding="{Binding [GsId]}" IsReadOnly="True" Width="*"/>
+            </DataGrid.Columns>
+          </DataGrid>
+          <GroupBox Grid.Row="4" Header="Existing boundary information (unique styles in the selection)">
+            <ScrollViewer MaxHeight="120" VerticalScrollBarVisibility="Auto"><TextBlock x:Name="ExistingInfo" TextWrapping="Wrap" FontFamily="Consolas"/></ScrollViewer>
+          </GroupBox>
+        </Grid>
+      </TabItem>
+      <!-- ===== TAB 2: BUILDER ===== -->
+      <TabItem Header="  2 &#xB7; Line Style Builder  ">
+        <Grid Margin="6">
+          <Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="420"/><ColumnDefinition Width="*" MinWidth="400"/></Grid.ColumnDefinitions>
+          <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+              <GroupBox Header="Mode">
+                <WrapPanel>
+                  <RadioButton x:Name="RbExisting" Content="A - Use existing" GroupName="mode" Checked="mode_changed"/>
+                  <RadioButton x:Name="RbDuplicate" Content="B - Duplicate existing" GroupName="mode" Checked="mode_changed"/>
+                  <RadioButton x:Name="RbNew" Content="C - Create new" GroupName="mode" Checked="mode_changed"/>
+                  <RadioButton x:Name="RbEdit" Content="Edit existing (shared!)" GroupName="mode" Checked="mode_changed"/>
+                </WrapPanel>
+              </GroupBox>
+              <GroupBox Header="Source / existing Line Style">
+                <StackPanel>
+                  <TextBox x:Name="StyleSearch" TextChanged="style_search_changed" ToolTip="Type to search Line Styles"/>
+                  <ComboBox x:Name="StyleCombo" SelectionChanged="style_selected"/>
+                  <TextBlock x:Name="StyleHint" Foreground="#FF777777" TextWrapping="Wrap" Margin="3,2"/>
+                </StackPanel>
+              </GroupBox>
+              <GroupBox Header="ENTER CUSTOM LINE STYLE NAME">
+                <StackPanel>
+                  <TextBox x:Name="NameBox" TextChanged="name_changed" FontSize="13"/>
+                  <TextBlock x:Name="NameStatus" TextWrapping="Wrap" Margin="3,2"/>
+                </StackPanel>
+              </GroupBox>
+              <GroupBox Header="Line weight">
+                <StackPanel>
+                  <ComboBox x:Name="WeightCombo" SelectionChanged="weight_changed"/>
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Target mm:" VerticalAlignment="Center" Margin="4,0"/>
+                    <TextBox x:Name="MmBox" Width="60"/>
+                    <Button Content="Snap to nearest weight" Click="mm_snap"/>
+                  </StackPanel>
+                  <TextBlock x:Name="CutNote" Foreground="#FF777777" TextWrapping="Wrap" Margin="3,2"
+                             Text="Cut weight: not applicable to Line Styles (Revit stores a projection weight only). mm values are reference values: the Revit API does not expose the project line-weight table."/>
+                </StackPanel>
+              </GroupBox>
+              <GroupBox Header="Line colour">
+                <StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <Border x:Name="ColourSwatch" Width="36" Height="24" BorderBrush="#FF888888" BorderThickness="1" Margin="3"/>
+                    <Button Content="Colour picker..." Click="pick_colour"/>
+                    <Button Content="Reset colour" Click="reset_colour"/>
+                  </StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="R" VerticalAlignment="Center" Margin="4,0"/><TextBox x:Name="RBox" Width="42" TextChanged="rgb_changed"/>
+                    <TextBlock Text="G" VerticalAlignment="Center" Margin="4,0"/><TextBox x:Name="GBox" Width="42" TextChanged="rgb_changed"/>
+                    <TextBlock Text="B" VerticalAlignment="Center" Margin="4,0"/><TextBox x:Name="BBox" Width="42" TextChanged="rgb_changed"/>
+                    <TextBlock Text="HEX" VerticalAlignment="Center" Margin="12,0,4,0"/><TextBox x:Name="HexBox" Width="84" TextChanged="hex_changed"/>
+                  </StackPanel>
+                </StackPanel>
+              </GroupBox>
+              <GroupBox Header="Line pattern">
+                <StackPanel>
+                  <TextBox x:Name="PatternSearch" TextChanged="pattern_search_changed" ToolTip="Type to search Line Patterns"/>
+                  <ComboBox x:Name="PatternCombo" SelectionChanged="pattern_changed"/>
+                  <StackPanel Orientation="Horizontal">
+                    <Button Content="Reset pattern" Click="reset_pattern"/>
+                    <Button Content="Reset ALL to original" Click="reset_all"/>
+                  </StackPanel>
+                </StackPanel>
+              </GroupBox>
+            </StackPanel>
+          </ScrollViewer>
+          <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+              <GroupBox Header="Live preview (does not modify Revit)">
+                <ContentControl x:Name="PreviewHost"/>
+              </GroupBox>
+              <GroupBox Header="Where to apply">
+                <StackPanel>
+                  <RadioButton x:Name="RbApplySelected" Content="All boundaries of the selected Filled Regions" GroupName="apply"/>
+                  <RadioButton x:Name="RbApplySegments" Content="Selected boundary segments only (ticked in tab 1)" GroupName="apply"/>
+                  <RadioButton x:Name="RbApplyView" Content="All Filled Regions in the active view" GroupName="apply"/>
+                  <StackPanel Orientation="Horizontal">
+                    <RadioButton x:Name="RbApplyType" Content="Filled Regions of type:" GroupName="apply"/>
+                    <ComboBox x:Name="ApplyTypeCombo" Width="190"/>
+                    <CheckBox x:Name="ChkTypeProject" Content="whole project" VerticalAlignment="Center" Margin="4,0"/>
+                  </StackPanel>
+                </StackPanel>
+              </GroupBox>
+              <GroupBox Header="Actions (saving and applying are separate operations)">
+                <WrapPanel>
+                  <Button x:Name="BtnSave" Content="SAVE LINE STYLE" Click="save_style" FontWeight="Bold" Padding="14,8" Background="#FFC8E6C9"/>
+                  <Button x:Name="BtnSaveApply" Content="SAVE &amp; APPLY" Click="save_and_apply" FontWeight="Bold" Padding="14,8" Background="#FFBBDEFB"/>
+                  <Button x:Name="BtnSavePreset" Content="SAVE AS PRESET" Click="save_preset_from_builder" FontWeight="Bold" Padding="14,8" Background="#FFFFE0B2"/>
+                  <Button x:Name="BtnApplyExisting" Content="APPLY STYLE (no new style)" Click="apply_existing" FontWeight="Bold" Padding="14,8"/>
+                </WrapPanel>
+              </GroupBox>
+              <TextBlock Text="A Line Style saved here is a genuine Revit subcategory of Lines stored in the project. A preset is only an external settings file." TextWrapping="Wrap" Foreground="#FF777777" Margin="8"/>
+            </StackPanel>
+          </ScrollViewer>
+        </Grid>
+      </TabItem>
+      <!-- ===== TAB 3: MY STYLES ===== -->
+      <TabItem Header="  3 &#xB7; My Custom Line Styles  ">
+        <DockPanel Margin="6">
+          <WrapPanel DockPanel.Dock="Top">
+            <Button Content="Create New" Click="ms_create_new"/>
+            <Button Content="Duplicate" Click="ms_duplicate"/>
+            <Button Content="Edit" Click="ms_edit"/>
+            <Button Content="Rename" Click="ms_rename"/>
+            <Button Content="Apply to selection" Click="ms_apply"/>
+            <Button Content="Refresh" Click="ms_refresh"/>
+            <Button Content="Delete" Click="ms_delete"/>
+            <Button Content="Show usage" Click="ms_usage"/>
+            <CheckBox x:Name="ChkShowBuiltIn" Content="also show built-in styles" VerticalAlignment="Center" Margin="10,0" Checked="ms_refresh" Unchecked="ms_refresh"/>
+          </WrapPanel>
+          <DataGrid x:Name="MyStylesGrid" SelectionMode="Single">
+            <DataGrid.Columns>
+              <DataGridTemplateColumn Header="" Width="34">
+                <DataGridTemplateColumn.CellTemplate><DataTemplate>
+                  <Rectangle Width="20" Height="12" Fill="{Binding [Hex]}" Stroke="#FF999999"/>
+                </DataTemplate></DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTextColumn Header="Line Style Name" Binding="{Binding [Name]}" Width="300"/>
+              <DataGridTextColumn Header="Weight" Binding="{Binding [Weight]}" Width="70"/>
+              <DataGridTextColumn Header="approx. mm" Binding="{Binding [Mm]}" Width="90"/>
+              <DataGridTextColumn Header="Colour" Binding="{Binding [Hex]}" Width="90"/>
+              <DataGridTextColumn Header="Pattern" Binding="{Binding [Pattern]}" Width="160"/>
+              <DataGridTextColumn Header="Original style (if duplicated)" Binding="{Binding [Origin]}" Width="*"/>
+            </DataGrid.Columns>
+          </DataGrid>
+        </DockPanel>
+      </TabItem>
+      <!-- ===== TAB 4: PRESETS ===== -->
+      <TabItem Header="  4 &#xB7; Custom Preset Library  ">
+        <DockPanel Margin="6">
+          <WrapPanel DockPanel.Dock="Top">
+            <Button Content="Save Preset (from builder)" Click="pr_save"/>
+            <Button Content="Load Preset into builder" Click="pr_load"/>
+            <Button Content="Create Revit style from preset" Click="pr_create_style"/>
+            <Button Content="Rename" Click="pr_rename"/>
+            <Button Content="Duplicate" Click="pr_duplicate"/>
+            <Button Content="Delete" Click="pr_delete"/>
+            <Button Content="Import..." Click="pr_import"/>
+            <Button Content="Export..." Click="pr_export"/>
+          </WrapPanel>
+          <TextBlock DockPanel.Dock="Bottom" x:Name="PresetPath" Foreground="#FF777777" Margin="6"/>
+          <DataGrid x:Name="PresetGrid" SelectionMode="Single">
+            <DataGrid.Columns>
+              <DataGridTemplateColumn Header="" Width="34">
+                <DataGridTemplateColumn.CellTemplate><DataTemplate>
+                  <Rectangle Width="20" Height="12" Fill="{Binding [Hex]}" Stroke="#FF999999"/>
+                </DataTemplate></DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTextColumn Header="Preset" Binding="{Binding [Name]}" Width="300"/>
+              <DataGridTextColumn Header="Weight" Binding="{Binding [Weight]}" Width="70"/>
+              <DataGridTextColumn Header="Colour" Binding="{Binding [Hex]}" Width="90"/>
+              <DataGridTextColumn Header="Pattern (by name)" Binding="{Binding [Pattern]}" Width="170"/>
+              <DataGridTextColumn Header="Available in this project?" Binding="{Binding [Avail]}" Width="*"/>
+            </DataGrid.Columns>
+          </DataGrid>
+        </DockPanel>
+      </TabItem>
+      <!-- ===== TAB 5: BATCH ===== -->
+      <TabItem Header="  5 &#xB7; Batch Replace  ">
+        <StackPanel Margin="10" MaxWidth="760" HorizontalAlignment="Left">
+          <TextBlock Text="BATCH LINE STYLE REPLACEMENT" FontWeight="Bold" FontSize="14" Margin="4"/>
+          <TextBlock Text="Replaces a boundary Line Style on Filled Region boundaries only. Ordinary Detail Lines and Model Lines are never modified." TextWrapping="Wrap" Margin="4,0,4,8" Foreground="#FF666666"/>
+          <Grid>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="110"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <TextBlock Text="Find style:" VerticalAlignment="Center" Margin="4"/>
+            <ComboBox x:Name="ReplaceFromCombo" Grid.Column="1"/>
+            <TextBlock Text="Replace with:" Grid.Row="1" VerticalAlignment="Center" Margin="4"/>
+            <ComboBox x:Name="ReplaceToCombo" Grid.Row="1" Grid.Column="1"/>
+          </Grid>
+          <GroupBox Header="Scope">
+            <StackPanel>
+              <RadioButton x:Name="RbScopeSel" Content="Selected Filled Regions (tab 1)"/>
+              <RadioButton x:Name="RbScopeView" Content="Active view"/>
+              <RadioButton x:Name="RbScopeProj" Content="Entire current project"/>
+            </StackPanel>
+          </GroupBox>
+          <StackPanel Orientation="Horizontal">
+            <Button Content="Scan (count affected)" Click="br_scan"/>
+            <Button Content="Replace" Click="br_replace" FontWeight="Bold"/>
+          </StackPanel>
+          <TextBlock x:Name="ReplaceInfo" TextWrapping="Wrap" Margin="6" FontFamily="Consolas"/>
+        </StackPanel>
+      </TabItem>
+      <!-- ===== TAB 6: AUDIT ===== -->
+      <TabItem Header="  6 &#xB7; Graphics Audit  ">
+        <DockPanel Margin="6">
+          <WrapPanel DockPanel.Dock="Top">
+            <RadioButton x:Name="RbAuditView" Content="Active view" VerticalAlignment="Center"/>
+            <RadioButton x:Name="RbAuditProj" Content="Entire project" VerticalAlignment="Center"/>
+            <RadioButton x:Name="RbAuditSel" Content="Selected regions" VerticalAlignment="Center"/>
+            <TextBlock Text="  Unwanted styles (comma separated):" VerticalAlignment="Center"/>
+            <TextBox x:Name="AuditUnwanted" Width="240"/>
+            <Button Content="Run audit (read-only)" Click="audit_run" FontWeight="Bold"/>
+          </WrapPanel>
+          <WrapPanel DockPanel.Dock="Top">
+            <TextBlock Text="Filter by Line Style / type:" VerticalAlignment="Center" Margin="4,0"/>
+            <TextBox x:Name="AuditFilter" Width="260" TextChanged="audit_filter_changed"/>
+            <Button Content="Export CSV" Click="audit_export"/>
+            <Button Content="Select flagged regions in Revit" Click="audit_select_flagged"/>
+            <TextBlock x:Name="AuditSummary" VerticalAlignment="Center" Margin="10,0" FontWeight="SemiBold"/>
+          </WrapPanel>
+          <DataGrid x:Name="AuditGrid">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Region ID" Binding="{Binding [Region]}" Width="90"/>
+              <DataGridTextColumn Header="Filled Region Type" Binding="{Binding [Type]}" Width="220"/>
+              <DataGridTextColumn Header="Boundary Line Style" Binding="{Binding [Style]}" Width="220"/>
+              <DataGridTextColumn Header="Weight" Binding="{Binding [Weight]}" Width="60"/>
+              <DataGridTextColumn Header="approx. mm" Binding="{Binding [Mm]}" Width="80"/>
+              <DataGridTextColumn Header="Colour" Binding="{Binding [Hex]}" Width="80"/>
+              <DataGridTextColumn Header="Pattern" Binding="{Binding [Pattern]}" Width="130"/>
+              <DataGridTextColumn Header="Segments" Binding="{Binding [Segments]}" Width="70"/>
+              <DataGridTextColumn Header="Flag" Binding="{Binding [Flag]}" Width="*"/>
+            </DataGrid.Columns>
+          </DataGrid>
+        </DockPanel>
+      </TabItem>
+    </TabControl>
+  </DockPanel>
+</Window>

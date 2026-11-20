@@ -1,0 +1,6 @@
+title: Planting Quantity
+tooltip: >-
+  Scans the whole project for Filled Regions whose type has
+  Type Comments = Planting, calculates the number of plants from the
+  enclosed area and the Planting spacing parameter, shows a preview and,
+  after confirmation, writes the result to Planting Quantity.

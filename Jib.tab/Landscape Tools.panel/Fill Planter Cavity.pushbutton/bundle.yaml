@@ -1,0 +1,7 @@
+title: Fill Planter Cavity (026)
+tooltip: >-
+  Click inside a planter soil area in a section/detail view. Creates the 026 Filled Region
+  from the detected cavity (small gaps are closed) plus the 005 / 006 / 008 line-based
+  Detail Items and the 010 Detail Component (halftone). Shift+Click = settings.
+author: BIM Automation
+min_revit_ver: 2022

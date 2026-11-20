@@ -1,0 +1,30 @@
+<Border xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        BorderBrush="#FFCCCCCC" BorderThickness="1" CornerRadius="4" Background="White" Padding="8">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*"/>
+      <ColumnDefinition Width="8"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+    <StackPanel Grid.Column="0">
+      <TextBlock Text="BEFORE" FontWeight="Bold" Foreground="#FF607D8B"/>
+      <Rectangle x:Name="BeforeRect" Height="70" Margin="6,6" Fill="#FFE8F5E9" Stroke="Black" StrokeThickness="1"/>
+      <StackPanel Orientation="Horizontal">
+        <Border x:Name="BeforeSwatch" Width="14" Height="14" BorderBrush="#FF999999" BorderThickness="1" Margin="0,0,6,0"/>
+        <TextBlock x:Name="BeforeName" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+      </StackPanel>
+      <TextBlock x:Name="BeforeInfo" Foreground="#FF555555" FontSize="11"/>
+    </StackPanel>
+    <Rectangle Grid.Column="1" Width="1" Fill="#FFDDDDDD" HorizontalAlignment="Center"/>
+    <StackPanel Grid.Column="2">
+      <TextBlock Text="AFTER" FontWeight="Bold" Foreground="#FF2E7D32"/>
+      <Rectangle x:Name="AfterRect" Height="70" Margin="6,6" Fill="#FFE8F5E9" Stroke="Black" StrokeThickness="1"/>
+      <StackPanel Orientation="Horizontal">
+        <Border x:Name="AfterSwatch" Width="14" Height="14" BorderBrush="#FF999999" BorderThickness="1" Margin="0,0,6,0"/>
+        <TextBlock x:Name="AfterName" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+      </StackPanel>
+      <TextBlock x:Name="AfterInfo" Foreground="#FF555555" FontSize="11"/>
+    </StackPanel>
+  </Grid>
+</Border>

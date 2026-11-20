@@ -1,0 +1,12 @@
+{
+  "name": "FloorTools",
+  "version": "1.0.0",
+  "description": "Production tools for working with Revit Floors. First command: Floor to Fill Region.",
+  "author": "Floor Tools",
+  "url": "",
+  "website": "",
+  "image": "",
+  "dependencies": [],
+  "min_revit_version": 2021,
+  "target_revit_versions": [2021, 2022, 2023, 2024, 2025, 2026]
+}

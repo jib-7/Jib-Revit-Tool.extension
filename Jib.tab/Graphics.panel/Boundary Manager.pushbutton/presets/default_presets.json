@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "presets": [
+    {"name": "Landscape Boundary - Thin",   "weight": 2, "rgb": [0, 0, 0],       "pattern": "Solid", "notes": "Fine boundary for plans"},
+    {"name": "Landscape Boundary - Medium", "weight": 4, "rgb": [0, 0, 0],       "pattern": "Solid", "notes": ""},
+    {"name": "Landscape Boundary - Heavy",  "weight": 7, "rgb": [0, 0, 0],       "pattern": "Solid", "notes": ""},
+    {"name": "Landscape Hidden Boundary",   "weight": 2, "rgb": [128, 128, 128], "pattern": "Hidden", "notes": "Pattern name must exist in the project"},
+    {"name": "Landscape Detail Boundary",   "weight": 3, "rgb": [0, 0, 0],       "pattern": "Solid", "notes": ""},
+    {"name": "Landscape Section Boundary",  "weight": 5, "rgb": [0, 0, 0],       "pattern": "Solid", "notes": ""},
+    {"name": "Planting Boundary",           "weight": 3, "rgb": [0, 128, 0],     "pattern": "Solid", "notes": ""},
+    {"name": "Paving Boundary",             "weight": 3, "rgb": [128, 128, 128], "pattern": "Solid", "notes": ""}
+  ]
+}
